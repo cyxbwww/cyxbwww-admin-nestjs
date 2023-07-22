@@ -1,17 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
-import encry from 'src/utils/crypto';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  BeforeInsert,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn
+} from 'typeorm';
+import encry from '../../utils/crypto';
 import * as crypto from 'crypto';
+import { Role } from '../../role/entities/role.entity';
 
 @Entity('user')
 export class User {
-  @BeforeInsert()
-  beforeInsert() {
-    this.salt = crypto.randomBytes(4).toString('base64');
-    this.password = encry(this.password, this.salt);
-  }
-
-  @PrimaryGeneratedColumn('uuid')
-  id: number; // 标记为主键，值自动生成
+  @PrimaryGeneratedColumn()
+  id: string; // 标记为主键，值自动生成
 
   @Column({ length: 30 })
   username: string; // 用户名
@@ -19,7 +24,7 @@ export class User {
   @Column()
   password: string; // 密码
 
-  @Column()
+  @Column({ nullable: true })
   phone: string; // 手机
 
   @Column({ nullable: true })
@@ -28,15 +33,27 @@ export class User {
   @Column({ nullable: true })
   email: string; // 邮箱
 
-  @Column({ nullable: true })
-  role: string; // 角色
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'user_role_relation'
+  })
+  roles: Role[]; // 角色
 
   @Column({ nullable: true })
   salt: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  create_time: Date;
+  @CreateDateColumn()
+  createTime: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  update_time: Date;
+  @UpdateDateColumn()
+  updateTime: Date;
+
+  @DeleteDateColumn()
+  deleteTime: Date;
+
+  @BeforeInsert()
+  beforeInsert() {
+    this.salt = crypto.randomBytes(4).toString('base64');
+    this.password = encry(this.password, this.salt);
+  }
 }

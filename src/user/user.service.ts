@@ -1,37 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Role } from '../role/entities/role.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import { ApiException } from 'src/common/filter/http-exception/api.exception';
 import { ApiErrorCode } from 'src/common/enums/api-error-code.enum';
-import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>
   ) {}
 
-  async findAll() {
-    return await this.userRepository.find();
-  }
-
-  async findOne(username: string) {
-    const user = await this.userRepository.findOne({
-      where: { username }
-    });
-
-    if (!user) {
-      throw new HttpException('用户名不存在', HttpStatus.BAD_REQUEST);
-    }
-
-    return user;
-  }
-
-  async createUser(createUserDto: CreateUserDto) {
-    const { username } = createUserDto;
+  async create(createUserDto: CreateUserDto) {
+    const { username, password, roleIds } = createUserDto;
     const existUser = await this.userRepository.findOne({
       where: { username }
     });
@@ -41,11 +27,47 @@ export class UserService {
     }
 
     try {
-      const newUser = await this.userRepository.create(createUserDto);
+      // 查询数组 roleIds 对应所有 role 的实例
+      const roles = await this.roleRepository.find({
+        where: {
+          id: In(roleIds)
+        }
+      });
+      const newUser = await this.userRepository.create({
+        username,
+        password,
+        roles
+      });
       await this.userRepository.save(newUser);
+
       return '用户添加成功';
-    } catch (e) {
-      throw new ApiException(e, ApiErrorCode.INTERNAL_SERVER_ERROR);
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async findOne(username: string) {
+    const user = await this.userRepository.findOne({
+      where: { username }
+    });
+
+    if (!user) {
+      throw new ApiException('用户名不存在', ApiErrorCode.USER_NOTEXIST);
+    }
+
+    return user;
+  }
+
+  async findPermissionNames(token: string, userInfo) {
+    const user = await this.userRepository.findOne({
+      where: { username: userInfo.username },
+      relations: ['roles', 'roles.permissions']
+    });
+    if (user) {
+      const permissions = user.roles.flatMap(role => role.permissions);
+      const permissionNames = permissions.map(item => item.name);
+      return [...new Set(permissionNames)];
+    } else {
+      return [];
     }
   }
 }

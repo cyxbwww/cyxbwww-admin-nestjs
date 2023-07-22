@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { RoleModule } from './role/role.module';
+import { PermissionModule } from './permission/permission.module';
 import * as path from 'path';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -25,7 +27,9 @@ const isProd = process.env.NODE_ENV === 'production';
       database: process.env.DB_DATABASE // 数据库名
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    RoleModule,
+    PermissionModule
   ],
   controllers: [AppController],
   providers: [AppService]
