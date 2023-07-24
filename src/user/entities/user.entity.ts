@@ -19,7 +19,7 @@ export class User {
   id: string; // 标记为主键，值自动生成
 
   @Column({ length: 30 })
-  username: string; // 用户名
+  userName: string; // 用户名
 
   @Column()
   password: string; // 密码

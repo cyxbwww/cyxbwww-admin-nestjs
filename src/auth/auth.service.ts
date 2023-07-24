@@ -9,14 +9,18 @@ export class AuthService {
   constructor(private userService: UserService, private jwtService: JwtService) {}
 
   async login(loginAuthDto: LoginAuthDto) {
-    const { username, password } = loginAuthDto;
-    const user = await this.userService.findOne(username);
+    const { userName, password } = loginAuthDto;
+    const userInfo = await this.userService.findOne(userName);
 
-    if (user?.password !== encry(password, user.salt)) {
+    if (userInfo?.password !== encry(password, userInfo.salt)) {
       throw new HttpException('密码错误', HttpStatus.UNAUTHORIZED);
     }
 
-    const payload = { username: user.username, sub: user.id };
-    return await this.jwtService.signAsync(payload);
+    const payload = { username: userInfo.userName, sub: userInfo.id };
+    const token = await this.jwtService.signAsync(payload);
+    return {
+      userInfo,
+      token
+    };
   }
 }

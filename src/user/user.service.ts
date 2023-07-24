@@ -17,9 +17,9 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { username, password, roleIds } = createUserDto;
+    const { userName, password, roleIds } = createUserDto;
     const existUser = await this.userRepository.findOne({
-      where: { username }
+      where: { userName }
     });
 
     if (existUser) {
@@ -34,7 +34,7 @@ export class UserService {
         }
       });
       const newUser = await this.userRepository.create({
-        username,
+        userName,
         password,
         roles
       });
@@ -45,9 +45,9 @@ export class UserService {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async findOne(username: string) {
+  async findOne(userName: string) {
     const user = await this.userRepository.findOne({
-      where: { username }
+      where: { userName }
     });
 
     if (!user) {
@@ -59,7 +59,7 @@ export class UserService {
 
   async findPermissionNames(token: string, userInfo) {
     const user = await this.userRepository.findOne({
-      where: { username: userInfo.username },
+      where: { userName: userInfo.userName },
       relations: ['roles', 'roles.permissions']
     });
     if (user) {

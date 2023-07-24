@@ -8,13 +8,16 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { Permission } from '../../permission/entities/permission.entity';
+import { Menu } from '../../menu/entities/menu.entity';
 
 @Entity()
 export class Role {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ length: 20 })
+  @Column({
+    length: 20
+  })
   name: string;
 
   @CreateDateColumn()
@@ -24,6 +27,14 @@ export class Role {
   updateTime: Date;
 
   @ManyToMany(() => Permission)
-  @JoinTable({ name: 'role_permission_relation' })
+  @JoinTable({
+    name: 'role_permission_relation'
+  })
   permissions: Permission[];
+
+  @ManyToMany(() => Menu)
+  @JoinTable({
+    name: 'role_menu_relation'
+  })
+  menus: Menu[];
 }

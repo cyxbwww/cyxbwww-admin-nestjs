@@ -6,5 +6,6 @@ export enum ApiErrorCode {
   INTERNAL_SERVER_ERROR = 10004, // 服务器内部错误
   PERMISSSION_EXIST = 10005, // 权限字段已存在
   ROLE_EXIST = 10006, // 角色已存在
-  Forbidden = 10007 // 权限不足
+  Forbidden = 10007, // 权限不足
+  DATABASE_ERROR = 10008 // 数据库错误
 }
