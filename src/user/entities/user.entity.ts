@@ -16,7 +16,7 @@ import { Role } from '../../role/entities/role.entity';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
-  id: string; // 标记为主键，值自动生成
+  userId: string; // 标记为主键，值自动生成
 
   @Column({ length: 30 })
   userName: string; // 用户名
@@ -24,18 +24,24 @@ export class User {
   @Column()
   password: string; // 密码
 
-  @Column({ nullable: true })
+  @Column()
   phone: string; // 手机
+
+  @Column()
+  email: string; // 邮箱
 
   @Column({ nullable: true })
   avatar: string; // 头像
 
-  @Column({ nullable: true })
-  email: string; // 邮箱
+  @Column({ default: '1' })
+  userStatus: string; // 用户状态
 
   @ManyToMany(() => Role)
   @JoinTable({
-    name: 'user_role_relation'
+    name: 'user_role_relation',
+    joinColumn: {
+      name: 'userId'
+    }
   })
   roles: Role[]; // 角色
 
@@ -43,13 +49,13 @@ export class User {
   salt: string;
 
   @CreateDateColumn()
-  createTime: Date;
+  createAt: Date;
 
   @UpdateDateColumn()
-  updateTime: Date;
+  updateAt: Date;
 
   @DeleteDateColumn()
-  deleteTime: Date;
+  deleteAt: Date;
 
   @BeforeInsert()
   beforeInsert() {

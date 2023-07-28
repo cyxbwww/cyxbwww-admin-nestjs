@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { Role } from '../role/entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,8 +16,8 @@ export class UserService {
     private roleRepository: Repository<Role>
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const { userName, password, roleIds } = createUserDto;
+  async createUser(createUserDto: CreateUserDto) {
+    const { userName, password, phone, email, userStatus, userRoleIds } = createUserDto;
     const existUser = await this.userRepository.findOne({
       where: { userName }
     });
@@ -27,15 +27,18 @@ export class UserService {
     }
 
     try {
-      // 查询数组 roleIds 对应所有 role 的实例
+      // 查询数组 userRoleIds 对应所有 role 的实例
       const roles = await this.roleRepository.find({
         where: {
-          id: In(roleIds)
+          id: In(userRoleIds)
         }
       });
       const newUser = await this.userRepository.create({
         userName,
         password,
+        phone,
+        email,
+        userStatus,
         roles
       });
       await this.userRepository.save(newUser);
@@ -45,6 +48,33 @@ export class UserService {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async updateUser(updateUserDto: UpdateUserDto) {
+    const { userId, userName, password, phone, email, userStatus, userRoleIds } = updateUserDto;
+    delete updateUserDto.userRoleIds;
+    const roles = await this.roleRepository.find({
+      where: {
+        id: In(userRoleIds)
+      }
+    });
+    const existUser = await this.userRepository.findOne({
+      where: { userId }
+    });
+
+    await this.userRepository.save(
+      Object.assign(existUser, {
+        userName,
+        password,
+        phone,
+        email,
+        userStatus,
+        roles
+      })
+    );
+
+    return '更新用户成功';
+  }
+
   async findOne(userName: string) {
     const user = await this.userRepository.findOne({
       where: { userName }
@@ -68,6 +98,27 @@ export class UserService {
       return [...new Set(permissionNames)];
     } else {
       return [];
+    }
+  }
+
+  async getUserList(params) {
+    const { page, pageSize } = params;
+
+    return await this.userRepository.findAndCount({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      relations: ['roles'],
+      withDeleted: true
+    });
+  }
+
+  async deleteUser(params) {
+    try {
+      const { userId } = params;
+      await this.userRepository.softDelete({ userId });
+      return '删除成功';
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

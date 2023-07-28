@@ -3,6 +3,8 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
+import { ApiException } from '../common/filter/http-exception/api.exception';
+import { ApiErrorCode } from '../common/enums/api-error-code.enum';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,14 +19,14 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    if (!token) throw new HttpException('验证不通过', HttpStatus.FORBIDDEN);
+    if (!token) throw new ApiException('token验证失败', ApiErrorCode.TOKEN_ERROR);
 
     try {
       request['user'] = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET')
       });
     } catch {
-      throw new HttpException('token验证失败', HttpStatus.FORBIDDEN);
+      throw new ApiException('token验证失败', ApiErrorCode.TOKEN_ERROR);
     }
 
     return true;

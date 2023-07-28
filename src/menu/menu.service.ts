@@ -31,7 +31,7 @@ export class MenuService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.roles', 'role')
       .leftJoinAndSelect('role.menus', 'menu')
-      .where({ id: userId })
+      .where({ userId })
       .orderBy('menu.order', 'ASC')
       .getOne();
 

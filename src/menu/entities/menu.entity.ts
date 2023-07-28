@@ -57,8 +57,8 @@ export class Menu {
   createBy: string;
 
   @CreateDateColumn()
-  createTime: Date;
+  createAt: Date;
 
   @UpdateDateColumn()
-  updateTime: Date;
+  updateAt: Date;
 }

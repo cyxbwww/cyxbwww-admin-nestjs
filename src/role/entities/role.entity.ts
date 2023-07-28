@@ -15,16 +15,14 @@ export class Role {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({
-    length: 20
-  })
+  @Column()
   name: string;
 
   @CreateDateColumn()
-  createTime: Date;
+  createAt: Date;
 
   @UpdateDateColumn()
-  updateTime: Date;
+  updateAt: Date;
 
   @ManyToMany(() => Permission)
   @JoinTable({

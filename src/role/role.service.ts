@@ -15,7 +15,8 @@ export class RoleService {
     @InjectRepository(Permission)
     private permissionRepository: Repository<Permission>
   ) {}
-  async create(createRoleDto: CreateRoleDto) {
+
+  async createRole(createRoleDto: CreateRoleDto) {
     // 查询传入数组 permissionIds 的全部 permission 实体
     const permissions = await this.permissionRepository.find({
       where: {
@@ -29,5 +30,9 @@ export class RoleService {
 
     if (existRole) throw new ApiException('角色已存在', ApiErrorCode.ROLE_EXIST);
     return this.roleRepository.save({ permissions, name });
+  }
+
+  async getRoleList() {
+    return this.roleRepository.find();
   }
 }

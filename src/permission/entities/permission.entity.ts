@@ -12,8 +12,8 @@ export class Permission {
   desc: string;
 
   @CreateDateColumn()
-  createTime: Date;
+  createAt: Date;
 
   @UpdateDateColumn()
-  updateTime: Date;
+  updateAt: Date;
 }

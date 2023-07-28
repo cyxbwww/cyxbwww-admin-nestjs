@@ -7,5 +7,6 @@ export enum ApiErrorCode {
   PERMISSSION_EXIST = 10005, // 权限字段已存在
   ROLE_EXIST = 10006, // 角色已存在
   Forbidden = 10007, // 权限不足
-  DATABASE_ERROR = 10008 // 数据库错误
+  DATABASE_ERROR = 10008, // 数据库错误
+  TOKEN_ERROR = 10009 // 数据库错误
 }
