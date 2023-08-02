@@ -20,6 +20,7 @@ export class UserController {
   }
 
   @Post('getUserList')
+  @Post('read')
   getUserList(@Body() params) {
     return this.userService.getUserList(params);
   }

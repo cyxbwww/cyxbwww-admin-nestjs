@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
-export class Menu {
+export class Route {
   @PrimaryGeneratedColumn()
   id: string;
 

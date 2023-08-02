@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
-import { MenuModule } from './menu/menu.module';
+import { RouteModule } from './route/route.module';
 import * as path from 'path';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -31,7 +31,7 @@ const isProd = process.env.NODE_ENV === 'production';
     AuthModule,
     RoleModule,
     PermissionModule,
-    MenuModule
+    RouteModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,13 +1,13 @@
-export const convertToTree = (menuList, parentId: number | null = null) => {
+export const convertToTree = (routeList, parentId: number | null = null) => {
   const tree = [];
 
-  for (let i = 0; i < menuList.length; i++) {
-    if (menuList[i].parentId === parentId) {
-      const children = convertToTree(menuList, menuList[i].id);
+  for (let i = 0; i < routeList.length; i++) {
+    if (routeList[i].parentId === parentId) {
+      const children = convertToTree(routeList, routeList[i].id);
       if (children.length) {
-        menuList[i].children = children;
+        routeList[i].children = children;
       }
-      tree.push(menuList[i]);
+      tree.push(routeList[i]);
     }
   }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMenuDto } from './dto/create-menu.dto';
+import { CreateRouteDto } from './dto/create-route.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Menu } from './entities/menu.entity';
+import { Route } from './entities/route.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ApiException } from '../common/filter/http-exception/api.exception';
@@ -9,33 +9,34 @@ import { ApiErrorCode } from '../common/enums/api-error-code.enum';
 import { convertToTree } from '../utils/convertToTree';
 
 @Injectable()
-export class MenuService {
+export class RouteService {
   constructor(
-    @InjectRepository(Menu)
-    private menuRepository: Repository<Menu>,
+    @InjectRepository(Route)
+    private routeRepository: Repository<Route>,
     @InjectRepository(User)
     private userRepository: Repository<User>
   ) {}
 
-  async create(createMenuDto: CreateMenuDto) {
+  async create(createRouteDto: CreateRouteDto) {
     try {
-      await this.menuRepository.save(createMenuDto);
+      await this.routeRepository.save(createRouteDto);
     } catch (error) {
       throw new ApiException(error, ApiErrorCode.DATABASE_ERROR);
     }
     return '操作成功';
   }
 
-  async findMenu({ userId }) {
+  async getUserRoutes(params) {
+    const { userId } = params;
     const userList: User = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.roles', 'role')
-      .leftJoinAndSelect('role.menus', 'menu')
+      .leftJoinAndSelect('role.routes', 'route')
       .where({ userId })
-      .orderBy('menu.order', 'ASC')
+      .orderBy('route.order', 'ASC')
       .getOne();
 
-    const menuList = userList?.roles[0].menus.map(v => {
+    const routeList = userList?.roles[0].routes.map(v => {
       const { id, parentId, name, path, component, title, icon, order, requiresAuth, hide } = v;
       const route = {
         id,
@@ -60,7 +61,35 @@ export class MenuService {
 
     return {
       home: 'dashboard_analysis',
-      routes: convertToTree(menuList)
+      routes: convertToTree(routeList)
     };
+  }
+
+  async getRouteList() {
+    const route = await this.routeRepository.find();
+    const routeList = route.map(v => {
+      const { id, parentId, name, path, component, title, icon, order, requiresAuth, hide } = v;
+      const route = {
+        id,
+        name,
+        title,
+        path,
+        component,
+        parentId
+      };
+      const routeMeta = {
+        icon,
+        requiresAuth,
+        hide
+      };
+
+      Object.assign(parentId ? routeMeta : route, { order });
+
+      return Object.assign(route, {
+        meta: routeMeta
+      });
+    });
+
+    return convertToTree(routeList);
   }
 }

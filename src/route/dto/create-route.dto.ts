@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateMenuDto {
+export class CreateRouteDto {
   @IsNotEmpty({ message: '路由名称不可为空' })
   name: string;
   @IsNotEmpty({ message: '路由标题不可为空' })

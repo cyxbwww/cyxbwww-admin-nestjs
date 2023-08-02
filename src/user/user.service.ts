@@ -107,8 +107,7 @@ export class UserService {
     return await this.userRepository.findAndCount({
       skip: (page - 1) * pageSize,
       take: pageSize,
-      relations: ['roles'],
-      withDeleted: true
+      relations: ['roles']
     });
   }
 
@@ -116,7 +115,7 @@ export class UserService {
     try {
       const { userId } = params;
       await this.userRepository.softDelete({ userId });
-      return '删除成功';
+      return '删除用户成功';
     } catch (error) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
